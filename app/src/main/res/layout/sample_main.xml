@@ -1,0 +1,45 @@
+<!-- BEGIN_INCLUDE (view_pager_layout) -->
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:background="@drawable/bg" android:orientation="vertical"
+    android:padding="10dp" tools:context="com.wf.gu.udpchat.MainActivity">
+
+
+    <android.support.v4.view.ViewPager android:id="@+id/pager" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_weight="2" />
+    <!-- END_INCLUDE (view_pager_layout) -->
+
+
+    <!--
+      <LinearLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:layout_marginBottom="5dp"
+          android:layout_gravity="center"
+          >
+
+        <Button
+            android:id="@+id/login_btn"
+            android:text="Sing in"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:layout_width="120dp"
+            android:layout_height="39dp"
+            android:background="@drawable/mycorner"
+            />
+        <Button
+            android:id="@+id/register_btn"
+            android:text="Sign up"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:layout_marginLeft="5dp"
+            android:layout_width="120dp"
+            android:layout_height="39dp"
+            android:background="@drawable/mycorner"
+            />
+      </LinearLayout>
+    -->
+</LinearLayout>

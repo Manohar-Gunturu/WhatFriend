@@ -1,0 +1,67 @@
+package umt;
+
+import java.io.IOException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
+/**
+ * Created by SA on 21/12/2017.
+ */
+public class SocketWrapper {
+
+
+    static SocketServer socketServer = null;
+    static Random randomGen = new Random();
+    public static ArrayList<Callback> callbacks = new ArrayList<Callback>();
+
+
+    public static void send(String msg) {
+        try {
+            socketServer.send(msg,false);
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
+
+        public static String send(String msg, Callback c,boolean waitforReply) {
+        if (socketServer == null) {
+            try {
+                socketServer = new SocketServer("192.168.2.11");
+
+            } catch (SocketException | UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        try {
+           return socketServer.send(msg,waitforReply);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static void start() {
+        if (socketServer == null) {
+            try {
+                socketServer = new SocketServer("192.168.2.11");
+
+            } catch (SocketException | UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+        socketServer.listen();
+    }
+
+    public static void attachListener(Callback c) {
+        callbacks.add(c);
+    }
+
+}

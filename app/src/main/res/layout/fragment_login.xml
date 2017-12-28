@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:gravity="center" android:orientation="vertical"
+    android:weightSum="1" tools:context="com.wf.gu.udpchat.Login">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_margin="14dp" android:orientation="horizontal">
+
+        <ImageView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_gravity="center" android:layout_weight="0.09"
+            android:src="@drawable/ic" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp" android:text="What Friend" android:textColor="#fff"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <EditText android:id="@+id/editText" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_gravity="center" android:background="@drawable/rounded_edittext_states"
+        android:ems="11" android:hint="Email" android:inputType="textEmailAddress"
+        android:paddingBottom="8dp" android:paddingLeft="14dp"
+        android:paddingRight="8dp" android:paddingTop="8dp" />
+
+    <EditText android:id="@+id/editText2" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_gravity="center" android:layout_marginTop="5dp"
+        android:background="@drawable/rounded_edittext_states" android:ems="11" android:hint="Password"
+        android:imeOptions="actionSend" android:inputType="textPassword"
+        android:paddingBottom="8dp" android:paddingLeft="14dp" android:paddingRight="8dp"
+        android:paddingTop="8dp" />
+
+    <Button android:id="@+id/button" android:layout_width="120dp" android:layout_height="39dp"
+        android:layout_gravity="center" android:layout_marginTop="8dp" android:background="@drawable/mycorner"
+        android:text="Ok" android:textColor="#FFFFFF" android:textSize="16sp" />
+
+
+</LinearLayout>

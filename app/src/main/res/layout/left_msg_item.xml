@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <TextView android:id="@+id/msg_ri" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_gravity="left" android:background="@drawable/balloon_incoming_pressed"
+        android:maxWidth="300dp" android:minWidth="220dp"
+        android:paddingBottom="14dp"
+        android:paddingLeft="22dp" android:paddingRight="10dp"
+        android:paddingTop="10dp" android:text="Hello Manohar, This is fucking shit I know you are on wrong path.. What to do is is like fucking twice at same instance." android:textColor="#333333"
+        android:textSize="17dp" />
+
+    <TextView android:id="@+id/textView" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:layout_alignBottom="@+id/msg_ri" android:layout_alignEnd="@+id/msg_ri"
+        android:layout_alignRight="@+id/msg_ri" android:layout_marginBottom="4dp"
+        android:paddingRight="8dp" android:text="12:90 PM"
+        android:textColor="#b4b2b2" android:textSize="12dp" />
+
+
+</RelativeLayout>
