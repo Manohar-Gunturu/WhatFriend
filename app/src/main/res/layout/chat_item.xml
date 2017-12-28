@@ -20,7 +20,7 @@
 
     <ImageView android:id="@+id/list_avatar" android:layout_width="45dp"
         android:layout_height="45dp" android:scaleType="centerCrop"
-        tools:src="@drawable/a_avator" />
+        android:src="@drawable/download" />
 
     <TextView android:id="@+id/list_title" android:layout_width="match_parent"
         android:layout_height="wrap_content" android:layout_marginLeft="@dimen/md_keylines"

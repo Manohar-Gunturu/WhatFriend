@@ -61,6 +61,7 @@ public class Main2Activity extends AppCompatActivity {
         itemArray.clear();
         itemAdapter = new ArrayAdapter<String>(this, R.layout.activity_listview, itemArray);
         listView.setAdapter(itemAdapter);
+
         SharedPreferences sharedPref = this.getSharedPreferences("com.wf.gu.udpchat", Context.MODE_PRIVATE);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -77,21 +78,21 @@ public class Main2Activity extends AppCompatActivity {
             }
         });
 
-        if (Static.user_id == 0) {
-            Static.user_id = sharedPref.getInt("whatfriend_user_id", 0);
+        boolean condition = sharedPref.getBoolean("whatfriend_if_reg", false);
+        if (condition) {
             Static.user_name = sharedPref.getString("whatfriend_user_name", "").replaceAll(" ", "_");
-            Static.user_image = sharedPref.getString("whatfriend_user_image", "").replaceAll(" ", "_");
             Static.user_place = sharedPref.getString("whatfriend_user_place", "").replaceAll(" ", "");
+            Static.user_id = sharedPref.getInt("whatfriend_user_id",0);
         } else {
-            sharedPref.edit().putInt("whatfriend_user_id", Static.user_id).apply();
             sharedPref.edit().putString("whatfriend_user_name", Static.user_name.replaceAll(" ", "_")).apply();
-            sharedPref.edit().putString("whatfriend_user_image", Static.user_image.replaceAll(" ", "_")).apply();
             sharedPref.edit().putString("whatfriend_user_place", Static.user_place.replaceAll(" ", "_")).apply();
+            sharedPref.edit().putInt("whatfriend_user_id", Static.user_id).apply();
             sharedPref.edit().putBoolean("whatfriend_if_reg", true).apply();
         }
+
+
         Static.is_visible = true;
         Static.curent_view = "CHAT";
-        Log.d("curent_view", Static.curent_view);
 
         mSensorService = new UDPService();
         mServiceIntent = new Intent(getApplicationContext(), mSensorService.getClass());
@@ -104,16 +105,9 @@ public class Main2Activity extends AppCompatActivity {
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
-        // Set Tabs inside Toolbar
         final TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         Static.curent_view = "CHAT";
-        // Create Navigation drawer and inlfate layout
-        //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        //mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer);
-        // Adding menu icon to Toolbar
-
-        // Set behavior of Navigation drawer
 
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

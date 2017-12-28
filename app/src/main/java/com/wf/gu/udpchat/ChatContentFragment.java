@@ -30,55 +30,33 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
+import umt.Callback;
+import umt.SocketWrapper;
+
 /**
  * Provides UI for the view with List.
  */
 public class ChatContentFragment extends Fragment {
 
     public static final ArrayList<String> names = new ArrayList<>();
-    public static final ArrayList<String> message = new ArrayList<>();
+    public static final ArrayList<String> messages = new ArrayList<>();
     public static final ArrayList<String> date = new ArrayList<>();
-    public static final ArrayList<String> pictures = new ArrayList<>();
     public static ArrayList<Integer> ids = new ArrayList<>();
     DBHelper dbHelper = null;
     ConnectivityManager cm;
     ContentAdapter adapter;
     RecyclerView recyclerView;
+
+
+    public String getParameter(String str,String parameterName){
+        str = str.substring(str.indexOf(parameterName) + parameterName.length()+1);
+        return str.substring(0, str.indexOf(";"));
+    }
+
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            if (intent.getStringExtra("type").equals("typing")) {
-                if (ids.contains(intent.getIntExtra("id", 0))) {
-                    View v = recyclerView.getLayoutManager().findViewByPosition(ids.indexOf(intent.getIntExtra("id", 0)));
-                    TextView time = (TextView) v.findViewById(R.id.time_stamp);
-                    time.setText("typing");
-                }
-            } else if (intent.getStringExtra("type").equals("fout")) {
-                if (ids.contains(intent.getIntExtra("id", 0))) {
-                    View v = recyclerView.getLayoutManager().findViewByPosition(ids.indexOf(intent.getIntExtra("id", 0)));
-                    TextView time = (TextView) v.findViewById(R.id.time_stamp);
-                    time.setText("Focused Out");
-                }
-            } else {
-                if (ids.contains(intent.getIntExtra("id", 0))) {
-                    View v = recyclerView.getLayoutManager().findViewByPosition(ids.indexOf(intent.getIntExtra("id", 0)));
-                    TextView t = (TextView) v.findViewById(R.id.list_desc);
-                    t.setText(intent.getStringExtra("value"));
-                    TextView time = (TextView) v.findViewById(R.id.time_stamp);
-                    time.setText("NEW");
-                } else {
-                    saveContact(intent.getStringExtra("image"), intent.getIntExtra("id", 0));
-                    ids.add(0, intent.getIntExtra("id", 0));
-                    names.add(0, intent.getStringExtra("uname"));
-                    message.add(0, intent.getStringExtra("value"));
-                    date.add(0, intent.getStringExtra("date"));
-                    pictures.add(0, intent.getStringExtra("image"));
-                    adapter.notifyDataSetChanged();
-
-
-                }
-            }
         }
     };
 
@@ -91,23 +69,45 @@ public class ChatContentFragment extends Fragment {
         dbHelper = new DBHelper(getActivity().getApplication());
         names.clear();
         ids.clear();
-        message.clear();
+        messages.clear();
         date.clear();
-        pictures.clear();
-
         recyclerView.setAdapter(adapter);
         Static.curent_view = "CHAT";
 
-        //recyclerView.setHasFixedSize(true);
-        cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        SocketWrapper.attachListener(new Callback() {
+            @Override
+            public void onMessage(String message) {
+                if(message.isEmpty() || !getParameter(message, "type").equals("message")){
+                    return;
+                }
+                int id = Integer.parseInt(getParameter(message,"id"));
+                getActivity().runOnUiThread(()-> {
+                if (ids.contains(id)) {
+                    View v = recyclerView.getLayoutManager().findViewByPosition(ids.indexOf(id));
+                    TextView t = (TextView) v.findViewById(R.id.list_desc);
+                    t.setText(getParameter(message,"value"));
+                    TextView time = (TextView) v.findViewById(R.id.time_stamp);
+                    time.setText("NEW");
+                } else {
+                    ids.add(0, id);
+                    names.add(0,  getParameter(message,"uname") );
+                    messages.add(0, getParameter(message,"value"));
+                    date.add(0, getParameter(message,"date"));
 
+                    adapter.notifyDataSetChanged();
+                }
+                });
+            }
+        });
+
+
+        cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         return recyclerView;
     }
 
     @Override
     public void onStart() {
-        Log.d("curent_view", "OSTARTA IN CHAT FRAGMENT");
         Static.curent_view = "CHAT";
         new MyTask3().execute();
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
@@ -117,7 +117,6 @@ public class ChatContentFragment extends Fragment {
 
     @Override
     public void onResume() {
-        Log.d("curent_view", "OSTARTA IN CHAT FRAGMENT");
         Static.curent_view = "CHAT";
         super.onResume();
     }
@@ -125,51 +124,7 @@ public class ChatContentFragment extends Fragment {
     @Override
     public void onPause() {
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
-        //Static.curent_view = "SIR";
         super.onPause();
-    }
-
-    public void saveContact(final String picture, final int id) {
-
-
-        if (!picture.equals("user_files/download.svg")) {
-
-            Static.createBasef();
-            Picasso.with(getActivity())
-                    .load("http://" + Static.IP + ":8080/" + picture.replace("..", ""))
-                    .into(new Target() {
-                              @Override
-                              public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                  try {
-                                      File myDir = new File(Environment.getExternalStorageDirectory(), "WhatFriend/Profiles/");
-                                      if (!myDir.exists()) {
-                                          myDir.mkdirs();
-                                      }
-
-                                      String name = id + ".jpg";
-                                      myDir = new File(myDir, name);
-                                      FileOutputStream out = new FileOutputStream(myDir);
-                                      bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
-
-                                      out.flush();
-                                      out.close();
-                                  } catch (Exception e) {
-                                      // some action
-                                  }
-                              }
-
-                              @Override
-                              public void onBitmapFailed(Drawable errorDrawable) {
-                              }
-
-                              @Override
-                              public void onPrepareLoad(Drawable placeHolderDrawable) {
-                              }
-                          }
-                    );
-        }
-
-
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -192,7 +147,6 @@ public class ChatContentFragment extends Fragment {
                     intent.putExtra("USER_ID", ids.get(getAdapterPosition()));
                     intent.putExtra("USER_PLACE", "Not Loaded");
                     intent.putExtra("USER_STATUS", "Hey ");
-                    intent.putExtra("USER_IMAGE", pictures.get(getAdapterPosition()));
                     intent.putExtra("IS_CONTACT", false);
                     v.getContext().startActivity(intent);
                 }
@@ -220,13 +174,8 @@ public class ChatContentFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
 
             if (names.get(position) != null) {
-                if (pictures.get(position).equals("user_files/download.svg")) {
-                    Picasso.with(cs).load(R.drawable.download).into(holder.avator);
-                } else {
-                    Picasso.with(cs).load(new File(Environment.getExternalStorageDirectory(), "WhatFriend/Profiles/" + ids.get(position) + ".jpg")).transform(new CircleTransform()).error(R.drawable.download).into(holder.avator);
-                }
                 holder.name.setText(names.get(position));
-                holder.description.setText(message.get(position));
+                holder.description.setText(messages.get(position));
                 holder.time.setText(date.get(position));
             }
         }
@@ -243,8 +192,7 @@ public class ChatContentFragment extends Fragment {
         protected Void doInBackground(Void... params) {
             ids.clear();
             names.clear();
-            message.clear();
-            pictures.clear();
+            messages.clear();
             date.clear();
             SQLiteDatabase db = dbHelper.getReadableDatabase();
             Cursor cursor = db.rawQuery("SELECT distinct UID,UNAME,MESSAGE,HIMAGE,TIME, MAX(ID),IS_NEW FROM CHAT GROUP BY UID ORDER BY ID DESC", null);
@@ -252,8 +200,7 @@ public class ChatContentFragment extends Fragment {
                 do {
                     ids.add(cursor.getInt(cursor.getColumnIndex("UID")));
                     names.add(cursor.getString(cursor.getColumnIndex("UNAME")));
-                    message.add(cursor.getString(cursor.getColumnIndex("MESSAGE")));
-                    pictures.add(cursor.getString(cursor.getColumnIndex("HIMAGE")));
+                    messages.add(cursor.getString(cursor.getColumnIndex("MESSAGE")));
                     if (cursor.getInt(cursor.getColumnIndex("IS_NEW")) == 1) {
                         date.add("NEW");
                     } else {

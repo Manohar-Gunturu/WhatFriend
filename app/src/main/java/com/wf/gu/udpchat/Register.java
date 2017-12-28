@@ -30,6 +30,12 @@ public class Register extends Fragment {
     public static ProgressBar spinner;
     LinearLayout l;
 
+
+    public String getParameter(String str,String parameterName){
+        str = str.substring(str.indexOf(parameterName) + parameterName.length()+1);
+        return str.substring(0, str.indexOf(";"));
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -79,22 +85,32 @@ public class Register extends Fragment {
 
                 Static.user_name = full_name.getText().toString();
                 Static.user_place = autocompleteView.getText().toString();
-                Static.user_image = "user_files$download.svg";
 
-                String msg = "type=register;name="+full_name.getText().toString()+";"+
-                        "place="+Static.user_place+";";
+                String msg = "type=register;name=" + full_name.getText().toString() + ";" +
+                        "place=" + Static.user_place + ";";
 
                 Static.user_place = (Static.user_place).replaceAll(" ", "_");
                 Static.user_place = (Static.user_place).replaceAll(",", "");
 
-                Task t = new Task(msg, new Callback() {
+                Task t = new Task(msg);
+
+                SocketWrapper.attachListener(new Callback() {
                     @Override
                     public void onMessage(String message) {
-
+                        if(getParameter(message,"type").equals("user_id")){
+                            Static.user_id = Integer.parseInt(getParameter(message,"id"));
+                            Register.spinner.setVisibility(View.GONE);
+                            Intent inten = new Intent(MainActivity.cx, Main2Activity.class);
+                            inten.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            inten.putExtra("EXTRA_SESSION_ID", "NEW_USER");
+                            getActivity().startActivity(inten);
+                        }
                     }
                 });
 
-                t.execute();
+                new Thread(t).start();
+
+
             }
         });
 
@@ -123,36 +139,18 @@ public class Register extends Fragment {
     }
 
 
-    public class Task extends AsyncTask<String, Integer, String> {
-
+    class Task implements Runnable {
 
         String message = null;
-        Callback c;
 
-        Task(String msg, Callback nc) {
-            c = nc;
+        Task(String msg) {
             message = msg;
         }
 
         @Override
-        protected String doInBackground(String... strings) {
-            String s = SocketWrapper.send(message, c,true);
-            return s;
+        public void run() {
+            SocketWrapper.send(message);
         }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-            if(result != null){
-                Register.spinner.setVisibility(View.GONE);
-                Intent inten = new Intent(MainActivity.cx, Main2Activity.class);
-                inten.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                inten.putExtra("EXTRA_SESSION_ID", "NEW_USER");
-                getActivity().startActivity(inten);
-            }
-        }
-
-        }
-
+    }
 
 }

@@ -84,15 +84,9 @@ public class ListContentFragment extends Fragment {
         SocketWrapper.attachListener(new Callback() {
             @Override
             public void onMessage(String message) {
-
-                   Log.e("rec",message);
                     if(!message.isEmpty() && getParameter(message,"type").equals("users")) {
-
-
                         final String m = message.replace("type=users;","");
-
                         getActivity().runOnUiThread(()->{
-
                             String[] users = m.split("#\\$");
                             for(String s : users){
                                 if(s.isEmpty())
@@ -102,9 +96,7 @@ public class ListContentFragment extends Fragment {
                                 ids.add(Integer.parseInt(s.split(":")[2]));
                                 status.add("Hey there! I am using WhatFriend");
                             }
-
                             adapter.notifyDataSetChanged();
-
                         });
                     }
             }

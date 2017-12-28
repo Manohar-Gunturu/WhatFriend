@@ -119,7 +119,7 @@ public class Messages extends AppCompatActivity {
             @Override
             public void onMessage(String message) {
                 if (!message.isEmpty() && getParameter(message, "type").equals("message")) {
-                        if(getParameter(message, "type").equals(USER_ID)) {
+                        if(getParameter(message, "id").equals(USER_ID)) {
                             runOnUiThread(() -> {
                                 messages.add(getParameter(message, "value"));
                                 dates.add(getParameter(message, "date"));
@@ -131,7 +131,6 @@ public class Messages extends AppCompatActivity {
                                 }else{
                                     c.add(false);
                                 }
-
                                 mAdapter.notifyDataSetChanged();
                                 mRecyclerView.smoothScrollToPosition(b.size());
 
@@ -197,7 +196,7 @@ public class Messages extends AppCompatActivity {
                     j[0] = 1;
 
                     new Thread(() -> {
-                        String mes = "type=message;id=" +USER_ID+ ";value="+ms.getText().toString()+";date="+tmp+";";
+                        String mes = "type=message;id=" +USER_ID+ ";value="+ms.getText().toString()+";date="+tmp+";uname="+USER_NAME+";";
                         SocketWrapper.send(mes);
                     }).start();
 
@@ -208,14 +207,6 @@ public class Messages extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Unable to Connect to Server, May be the server is down", Toast.LENGTH_LONG).show();
                     j[0] = 0;
                 }
-
-                // if(MyService.client.getReadyState() == WebSocket.READYSTATE.OPEN) {
-                //MyService.sendMS("{\"name\": \"message\", \"id\": " + USER_ID + ", \"value\": \"" + ms.getText().toString() + "\"}");
-                //}else{
-                //Log.e("Socket error", String.valueOf(MyService.client.getReadyState()));
-                //}
-
-
             }
         });
 
