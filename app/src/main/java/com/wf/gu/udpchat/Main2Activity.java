@@ -33,17 +33,13 @@ import umt.SocketWrapper;
 
 public class Main2Activity extends AppCompatActivity {
 
-    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     ListView listView;
     Intent mServiceIntent;
-    private DrawerLayout mDrawerLayout;
-    private BroadcastReceiver mRegistrationBroadcastReceiver;
     private ArrayList<String> itemArray = new ArrayList<>();
     private ArrayList<Integer> itemid = new ArrayList<>();
     private ArrayList<String> place = new ArrayList<>();
     private ArrayList<String> pictures = new ArrayList<>();
     private ArrayAdapter<String> itemAdapter;
-    private boolean isReceiverRegistered;
     private UDPService mSensorService;
 
     @Override
@@ -99,7 +95,14 @@ public class Main2Activity extends AppCompatActivity {
 
         if (!isMyServiceRunning(mSensorService.getClass())) {
             startService(mServiceIntent);
+        }else{
+            new Thread(()->{
+                SocketWrapper.send("type=update_address;id="+Static.user_id+";");
+            });
+
         }
+
+
 
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
@@ -135,20 +138,6 @@ public class Main2Activity extends AppCompatActivity {
 
 
 
-        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                SharedPreferences sharedPreferences =
-                        PreferenceManager.getDefaultSharedPreferences(context);
-                boolean sentToken = sharedPreferences
-                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
-                if (sentToken) {
-                    Log.d("Token", "SET");
-                } else {
-                    Log.d("Token", "NOT SET");
-                }
-            }
-        };
 
 
     }
@@ -185,14 +174,6 @@ public class Main2Activity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == android.R.id.home) {
-            mDrawerLayout.openDrawer(GravityCompat.START);
-        }
         return super.onOptionsItemSelected(item);
     }
 

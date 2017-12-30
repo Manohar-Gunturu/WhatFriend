@@ -53,12 +53,7 @@ public class ChatContentFragment extends Fragment {
         return str.substring(0, str.indexOf(";"));
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
 
-        }
-    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,7 +75,7 @@ public class ChatContentFragment extends Fragment {
                 if(message.isEmpty() || !getParameter(message, "type").equals("message")){
                     return;
                 }
-                int id = Integer.parseInt(getParameter(message,"id"));
+                int id = Integer.parseInt(getParameter(message,"fid"));
                 getActivity().runOnUiThread(()-> {
                 if (ids.contains(id)) {
                     View v = recyclerView.getLayoutManager().findViewByPosition(ids.indexOf(id));
@@ -109,9 +104,6 @@ public class ChatContentFragment extends Fragment {
     @Override
     public void onStart() {
         Static.curent_view = "CHAT";
-        new MyTask3().execute();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
-                mMessageReceiver, new IntentFilter("event-chat"));
         super.onStart();
     }
 
@@ -123,7 +115,6 @@ public class ChatContentFragment extends Fragment {
 
     @Override
     public void onPause() {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 

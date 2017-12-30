@@ -2,6 +2,8 @@ package umt;
 
 import android.util.Log;
 
+import com.wf.gu.udpchat.DBHelper;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -48,15 +50,34 @@ public class SocketServer {
     public String send(String message, boolean expectReply) throws IOException {
         DatagramPacket packet = new DatagramPacket(message.getBytes(), message.length(), remoteAddr, 3003);
         socket.send(packet);
+        if(expectReply){
+            byte[] respose = new byte[250];
+            DatagramPacket reply = new DatagramPacket(respose, respose.length);
+            try {
+                socket.receive(reply);
+                return new String(reply.getData(),reply.getOffset(),reply.getLength()).trim();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         return "sent";
     }
 
 
 
     private void onReceive(String m) {
+        if(getParameter(m,"type").equals("message")){
+            DBHelper.ldb.execSQL("INSERT INTO CHAT(UID,MESSAGE,TIME,UNAME,HIMAGE,IS_NEW,IS_WHOM,IS_SENT) " +
+                    "VALUES("+Integer.parseInt(getParameter(m,"fid"))+",'"+getParameter(m,"value")+"','"+getParameter(m,"date")+"','"+getParameter(m,"uname")+"','user_files/download.svg',"+1+",1,1) ");
+        }
         for(Callback c : SocketWrapper.callbacks) {
             c.onMessage(m);
         }
+    }
+
+    public String getParameter(String str,String parameterName){
+        str = str.substring(str.indexOf(parameterName) + parameterName.length()+1);
+        return str.substring(0, str.indexOf(";"));
     }
 
 }

@@ -32,7 +32,7 @@ public class Register extends Fragment {
 
 
     public String getParameter(String str,String parameterName){
-        str = str.substring(str.indexOf(parameterName) + parameterName.length()+1);
+        str = str.substring(str.indexOf(parameterName+"=") + parameterName.length()+1);
         return str.substring(0, str.indexOf(";"));
     }
 
@@ -93,23 +93,7 @@ public class Register extends Fragment {
                 Static.user_place = (Static.user_place).replaceAll(",", "");
 
                 Task t = new Task(msg);
-
-                SocketWrapper.attachListener(new Callback() {
-                    @Override
-                    public void onMessage(String message) {
-                        if(getParameter(message,"type").equals("user_id")){
-                            Static.user_id = Integer.parseInt(getParameter(message,"id"));
-                            Register.spinner.setVisibility(View.GONE);
-                            Intent inten = new Intent(MainActivity.cx, Main2Activity.class);
-                            inten.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            inten.putExtra("EXTRA_SESSION_ID", "NEW_USER");
-                            getActivity().startActivity(inten);
-                        }
-                    }
-                });
-
-                new Thread(t).start();
-
+                t.execute();
 
             }
         });
@@ -139,7 +123,7 @@ public class Register extends Fragment {
     }
 
 
-    class Task implements Runnable {
+    class Task extends AsyncTask<String, Integer, String> {
 
         String message = null;
 
@@ -147,10 +131,27 @@ public class Register extends Fragment {
             message = msg;
         }
 
+
         @Override
-        public void run() {
-            SocketWrapper.send(message);
+        protected String doInBackground(String... strings) {
+            return SocketWrapper.send(message,true);
         }
+
+        @Override
+        protected void onPostExecute(String result){
+            Log.e("REC1",result);
+            if(getParameter(result,"type").equals("user_id")){
+                Log.e("REC",result);
+                Static.user_id = Integer.parseInt(getParameter(result,"id"));
+                Register.spinner.setVisibility(View.GONE);
+                Intent inten = new Intent(MainActivity.cx, Main2Activity.class);
+                inten.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                inten.putExtra("EXTRA_SESSION_ID", "NEW_USER");
+                getActivity().startActivity(inten);
+            }
+
+        }
+
     }
 
 }

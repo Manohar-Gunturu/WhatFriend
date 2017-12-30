@@ -19,7 +19,6 @@ import umt.SocketWrapper;
 public class UDPService extends Service {
 
     DBHelper dbHelper = null;
-    SQLiteDatabase db = null;
     BroadcastReceiver mReceiver;
 
     private boolean isNetworkAvailable() {
@@ -32,16 +31,10 @@ public class UDPService extends Service {
     @Override
     public void onCreate() {
         dbHelper = new DBHelper(this.getApplication());
-        db = dbHelper.getReadableDatabase();
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
         mReceiver = new MyReceiver();
         registerReceiver(mReceiver, intentFilter);
-        //cm = (ConnectivityManager) this.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        //LocalBroadcastManager.getInstance(this).registerReceiver(
-        //        mMessageReceiver, new IntentFilter("custom-event-name"));
-
         new Thread(()->{
             SocketWrapper.start();
         }).start();
@@ -50,7 +43,9 @@ public class UDPService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-
+        new Thread(()->{
+           SocketWrapper.send("type=update_address;id="+Static.user_id+";");
+        });
 
         return Service.START_STICKY;
     }

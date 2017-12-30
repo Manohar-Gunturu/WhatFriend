@@ -119,7 +119,8 @@ public class Messages extends AppCompatActivity {
             @Override
             public void onMessage(String message) {
                 if (!message.isEmpty() && getParameter(message, "type").equals("message")) {
-                        if(getParameter(message, "id").equals(USER_ID)) {
+                    Log.e("REC",message+USER_ID);
+                    if(getParameter(message, "fid").equals(USER_ID)) {
                             runOnUiThread(() -> {
                                 messages.add(getParameter(message, "value"));
                                 dates.add(getParameter(message, "date"));
@@ -196,7 +197,7 @@ public class Messages extends AppCompatActivity {
                     j[0] = 1;
 
                     new Thread(() -> {
-                        String mes = "type=message;id=" +USER_ID+ ";value="+ms.getText().toString()+";date="+tmp+";uname="+USER_NAME+";";
+                        String mes = "type=message;tid="+USER_ID+";fid=" +Static.user_id+ ";value="+ms.getText().toString()+";date="+formattedDate+";uname="+Static.user_name+";";
                         SocketWrapper.send(mes);
                     }).start();
 
@@ -258,46 +259,15 @@ public class Messages extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-    /*@Override
-    public void onRestoreInstanceState(Bundle savedInstanceState){
-        Static.curent_view = "MS_VIEW";
-        USER_NAME = savedInstanceState.getString("USER_NAME");
-        USER_PLACE = savedInstanceState.getString("USER_PLACE");
-        USER_STATUS = savedInstanceState.getString("USER_STATUS");
-        USER_IMAGE = savedInstanceState.getString("USER_IMAGE");
-        USER_ID = savedInstanceState.getInt("USER_ID");
-        is_c = savedInstanceState.getBoolean("IS_CONTACT");
-        Static.curr_view_users = USER_ID;
-        genView();
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        Log.d("SETTTT","YESSSSSSSSSSSSSSSSSSSSSSSSS");
-        savedInstanceState.putString("USER_NAME",USER_NAME);
-        savedInstanceState.putString("USER_PLACE",USER_PLACE);
-        Static.curr_view_users = USER_ID;
-        savedInstanceState.putString("USER_STATUS",USER_STATUS);
-        savedInstanceState.putString("USER_IMAGE",USER_IMAGE);
-        savedInstanceState.putInt("USER_ID",USER_ID);
-        savedInstanceState.putBoolean("IS_CONTACT",is_c);
-        super.onSaveInstanceState(savedInstanceState);
-    }
-*/
     @Override
     public void onStart() {
         Static.curent_view = "MS_VIEW";
-        new sTask().execute();
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
-                mMessageReceiver, new IntentFilter("event-chat-main"));
         super.onStart();
     }
 
     @Override
     public void onPause() {
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(
-                mMessageReceiver, new IntentFilter("event-chat-main"));
-
         super.onPause();
     }
 
@@ -339,53 +309,7 @@ public class Messages extends AppCompatActivity {
 
     }
 
-    private class sTask extends AsyncTask<Void, Void, String> {
 
-        @Override
-        protected String doInBackground(Void... params) {
-            if (isNetworkAvailable()) {
-                return Static.postData("http://" + Static.IP + ":8080/android/st.jsp?id=" + USER_ID);
-            } else {
-                return "no";
-            }
-        }
-
-
-        @Override
-        protected void onPostExecute(String i) {
-            if (!i.equals("no")) {
-                try {
-                    JSONObject obj = new JSONObject(i);
-                    if (obj.getInt("online") == 0) {
-                        Calendar cal = Calendar.getInstance();
-                        TimeZone tz = cal.getTimeZone();
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM h:mm a");
-                        sdf.setTimeZone(tz);
-                        las.setText("Last Seen " + sdf.format(new Date(obj.getLong("lat_seen") * 1000)));
-
-                    } else {
-                        las.setText("Online");
-                    }
-                    las.setVisibility(View.VISIBLE);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-    }
-
-    private class SeenTask extends AsyncTask<Void, Void, Void> {
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            db.execSQL("UPDATE CHAT SET IS_SENT=0 WHERE UID=" + USER_ID);
-            return null;
-        }
-
-
-    }
 
     private class DeleteTask extends AsyncTask<Void, Void, Integer> {
 
@@ -422,7 +346,6 @@ public class Messages extends AppCompatActivity {
             if (cursor != null && cursor.getCount() > 0 && cursor.moveToFirst()) {
                 do {
                     messages.add(0, cursor.getString(cursor.getColumnIndex("MESSAGE")));
-                    Log.e("IS_WHOM", cursor.getInt(cursor.getColumnIndex("IS_WHOM")) + "");
                     if (cursor.getInt(cursor.getColumnIndex("IS_WHOM")) == 0) {
                         b.add(0, false);
                     } else {

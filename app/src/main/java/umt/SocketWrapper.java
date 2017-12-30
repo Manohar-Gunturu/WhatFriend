@@ -15,11 +15,18 @@ public class SocketWrapper {
 
 
     static SocketServer socketServer = null;
-    static Random randomGen = new Random();
     public static ArrayList<Callback> callbacks = new ArrayList<Callback>();
 
 
     public static void send(String msg) {
+        if (socketServer == null) {
+            try {
+                socketServer = new SocketServer("192.168.2.11");
+
+            } catch (SocketException | UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             socketServer.send(msg,false);
         } catch (IOException e) {
@@ -28,11 +35,10 @@ public class SocketWrapper {
         }
     }
 
-        public static String send(String msg, Callback c,boolean waitforReply) {
+        public static String send(String msg, boolean waitforReply) {
         if (socketServer == null) {
             try {
                 socketServer = new SocketServer("192.168.2.11");
-
             } catch (SocketException | UnknownHostException e) {
                 e.printStackTrace();
             }
