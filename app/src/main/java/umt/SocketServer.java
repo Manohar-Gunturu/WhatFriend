@@ -1,5 +1,6 @@
 package umt;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.wf.gu.udpchat.DBHelper;
@@ -19,13 +20,18 @@ public class SocketServer {
     DatagramSocket socket = null;
     InetAddress remoteAddr = null;
     Callback callback = null;
+
+    public void setDb(SQLiteDatabase db) {
+        this.db = db;
+    }
+
+    SQLiteDatabase db;
     private String destAddr;
 
     public SocketServer(String destAddr) throws SocketException, UnknownHostException {
         this.destAddr = destAddr;
         socket = new DatagramSocket(null);
         remoteAddr = InetAddress.getByName(destAddr);
-
     }
 
 
@@ -67,7 +73,7 @@ public class SocketServer {
 
     private void onReceive(String m) {
         if(getParameter(m,"type").equals("message")){
-            DBHelper.ldb.execSQL("INSERT INTO CHAT(UID,MESSAGE,TIME,UNAME,HIMAGE,IS_NEW,IS_WHOM,IS_SENT) " +
+            db.execSQL("INSERT INTO CHAT(UID,MESSAGE,TIME,UNAME,HIMAGE,IS_NEW,IS_WHOM,IS_SENT) " +
                     "VALUES("+Integer.parseInt(getParameter(m,"fid"))+",'"+getParameter(m,"value")+"','"+getParameter(m,"date")+"','"+getParameter(m,"uname")+"','user_files/download.svg',"+1+",1,1) ");
         }
         for(Callback c : SocketWrapper.callbacks) {

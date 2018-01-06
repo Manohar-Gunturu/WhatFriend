@@ -182,7 +182,7 @@ public class ListContentFragment extends Fragment {
 
         @Override
         public void run() {
-            SocketWrapper.send("type=get_users;");
+            SocketWrapper.send("type=get_users;id="+Static.user_id+";");
         }
     }
 

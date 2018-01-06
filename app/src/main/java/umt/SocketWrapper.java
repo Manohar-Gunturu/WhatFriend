@@ -1,5 +1,7 @@
 package umt;
 
+import android.database.sqlite.SQLiteDatabase;
+
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -54,7 +56,7 @@ public class SocketWrapper {
     }
 
 
-    public static void start() {
+    public static void start(SQLiteDatabase DB) {
         if (socketServer == null) {
             try {
                 socketServer = new SocketServer("192.168.2.11");
@@ -63,6 +65,7 @@ public class SocketWrapper {
                 e.printStackTrace();
             }
         }
+        socketServer.setDb(DB);
         socketServer.listen();
     }
 
@@ -70,4 +73,7 @@ public class SocketWrapper {
         callbacks.add(c);
     }
 
+    public static void removelistner(Callback callback) {
+        callbacks.remove(callback);
+    }
 }

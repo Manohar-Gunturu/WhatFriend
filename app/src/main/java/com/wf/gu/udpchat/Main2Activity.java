@@ -53,7 +53,6 @@ public class Main2Activity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.mobile_list);
 
 
-
         itemArray.clear();
         itemAdapter = new ArrayAdapter<String>(this, R.layout.activity_listview, itemArray);
         listView.setAdapter(itemAdapter);

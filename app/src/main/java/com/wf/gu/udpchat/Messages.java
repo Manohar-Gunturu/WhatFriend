@@ -58,6 +58,7 @@ public class Messages extends AppCompatActivity {
     String date = "1/14", tmp;
     String pf_view = "MS";
     boolean loading = false;
+    Callback callback = null;
     private ArrayList<String> messages = new ArrayList<>();
     private ArrayList<String> dates = new ArrayList<>();
     private ArrayList<Boolean> b = new ArrayList<>();
@@ -65,12 +66,6 @@ public class Messages extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-    };
 
 
     public String getParameter(String str,String parameterName){
@@ -115,31 +110,34 @@ public class Messages extends AppCompatActivity {
         Static.curr_view_users = USER_ID;
         dbHelper = new DBHelper(this.getApplication());
         db = dbHelper.getReadableDatabase();
-        SocketWrapper.attachListener(new Callback() {
+
+        callback = new Callback() {
             @Override
             public void onMessage(String message) {
                 if (!message.isEmpty() && getParameter(message, "type").equals("message")) {
-                    Log.e("REC",message+USER_ID);
-                    if(getParameter(message, "fid").equals(USER_ID)) {
-                            runOnUiThread(() -> {
-                                messages.add(getParameter(message, "value"));
-                                dates.add(getParameter(message, "date"));
-                                b.add(true);
-                                tmp = (getParameter(message, "date")).split(" ")[0];
-                                date = dates.get(dates.size()-1).split(" ")[0];
-                                if (!date.equals(tmp)) {
-                                    c.add(true);
-                                }else{
-                                    c.add(false);
-                                }
-                                mAdapter.notifyDataSetChanged();
-                                mRecyclerView.smoothScrollToPosition(b.size());
-
-                            });
-                        }
+                    Log.e("RECM",message+" my id "+USER_ID);
+                    if(getParameter(message, "fid").equals(USER_ID+"")) {
+                        runOnUiThread(() -> {
+                            messages.add(getParameter(message, "value"));
+                            dates.add(getParameter(message, "date"));
+                            b.add(true);
+                            tmp = (getParameter(message, "date")).split(" ")[0];
+                            date = dates.get(dates.size()-1).split(" ")[0];
+                            if(!date.equals(tmp)){
+                                c.add(true);
+                            }else{
+                                c.add(false);
+                            }
+                            mAdapter.notifyDataSetChanged();
+                            mRecyclerView.smoothScrollToPosition(b.size());
+                        });
+                    }
                 }
             }
-        });
+        };
+
+        SocketWrapper.attachListener(callback);
+
         genView();
 
     }
@@ -275,6 +273,7 @@ public class Messages extends AppCompatActivity {
     public void onStop() {
         Static.curent_view = pf_view;
         Static.curr_view_users = 0;
+        SocketWrapper.removelistner(callback);
         super.onStop();
     }
 
@@ -295,10 +294,7 @@ public class Messages extends AppCompatActivity {
             super.onScrolled(recyclerView, dx, dy);
 
             if (dy < 0) {
-                //totalItemCount = mLayoutManager.getItemCount();
                 lastVisibleItem = mLayoutManager.findFirstCompletelyVisibleItemPosition();
-                Log.d("SCROLLINGGGGGGG", totalItemCount + " " + lastVisibleItem);
-
                 if (!loading && lastVisibleItem < 4) {
 
                     new HeavyTask1().execute(in = in + 8);

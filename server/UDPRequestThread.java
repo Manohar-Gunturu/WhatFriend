@@ -25,16 +25,15 @@ public class UDPRequestThread implements Runnable{
 			int id = Data.seq.getAndIncrement();
 			String[] tm = { getParameter(tmp,"name") , getParameter(tmp,"place")  };
 			send( "type=user_id;id="+id+";", request.getAddress(), request.getPort(), -1);							
-		    for( Integer i : Data.s.keySet() ) {
+		    for( Integer i : Data.clients.keySet() ) {
 				send("type=users;"+tm[0]+":"+tm[1]+":"+id, Data.clients.get(i), Data.ports.get(i), i);	
 			}
 			Data.s.put(id, tm);
 			Data.clients.put(id, request.getAddress());
 			Data.ports.put(id, request.getPort());	
-		}else if( getParameter(tmp,"type").equals("update_address") ){
+		}else if( getParameter(tmp,"type").equals("update_address") ){			
 			int i = Integer.parseInt(getParameter(tmp,"id"));
-			Data.clients.put(i, request.getAddress());
-			Data.ports.put(i, request.getPort());			
+			update_address(i, request.getAddress(), request.getPort());
 		}
 		else if( getParameter(tmp,"type").equals("get_users") ){
 		   String r = "type=users;";
@@ -65,11 +64,10 @@ public class UDPRequestThread implements Runnable{
 					System.out.println("sent reply as "+message);
 					byte[] b = (message).getBytes();					
 					DatagramPacket reply = new DatagramPacket(b, b.length, 
-							address, port );					
-					
+							address, port );										
 					try {			
 						socket.send(reply);
-					} catch (IOException e) {
+					} catch (IOException e) {						
 						if(i != -1){
 							Data.s.remove(i);
 							Data.clients.remove(i);
@@ -78,6 +76,12 @@ public class UDPRequestThread implements Runnable{
 						e.printStackTrace();
 					}
 	}		
+	
+	public void update_address(int id, InetAddress address, int port){
+			Data.clients.put(id, address);
+			Data.ports.put(id, port);			
+
+	}
 	
 	
 }

@@ -11,7 +11,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 10;
     private static final String DATABASE_NAME = "WhatFriend";
-    public  static SQLiteDatabase ldb = null;
+    private static SQLiteDatabase ldb = null;
 
 
     public DBHelper(Context context) {
@@ -28,6 +28,10 @@ public class DBHelper extends SQLiteOpenHelper {
         ldb = db;
     }
 
+
+    public static SQLiteDatabase getDB(){
+        return ldb;
+    }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i2) {
