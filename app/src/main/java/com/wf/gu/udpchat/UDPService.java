@@ -56,7 +56,7 @@ public class UDPService extends Service {
             public void run(){
                 SocketWrapper.send("type=update_address;id="+Static.user_id+";");
             }
-        },0,5000);
+        },0,30000);
 
         new Thread(()->{
            SocketWrapper.send("type=update_address;id="+Static.user_id+";");
