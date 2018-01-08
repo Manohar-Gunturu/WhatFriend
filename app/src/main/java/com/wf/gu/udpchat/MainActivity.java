@@ -158,11 +158,10 @@ public class MainActivity extends FragmentActivity {
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return "Login";
-                case 1:
+                    return "Register";
+                default:
                     return "Register";
             }
-            return null;
         }
         // END_INCLUDE (fragment_pager_adapter_getpagetitle)
     }

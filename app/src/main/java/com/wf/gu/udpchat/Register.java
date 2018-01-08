@@ -25,8 +25,7 @@ import umt.SocketWrapper;
 
 
 public class Register extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     public static ProgressBar spinner;
     LinearLayout l;
 
@@ -58,20 +57,22 @@ public class Register extends Fragment {
         });
 
         Button submit = (Button) rootView.findViewById(R.id.button);
+        //on click of register button
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //if not connected to a network  make toast
                 if (!isNetworkAvailable()) {
                     Toast.makeText(getActivity(), "Unable To Connect", Toast.LENGTH_LONG).show();
                     return;
                 }
                 EditText full_name = (EditText) rootView.findViewById(R.id.editText3);
-                EditText email = (EditText) rootView.findViewById(R.id.editText);
-                EditText pass = (EditText) rootView.findViewById(R.id.editText2);
+
                 if (full_name.getText() == null || full_name.getText().length() < 3) {
                     full_name.setError("User name please !!");
                     return;
                 }
+
                 if (autocompleteView.getText() == null || autocompleteView.getText().length() < 3) {
                     autocompleteView.setError("Present City !!");
                     return;
@@ -92,6 +93,7 @@ public class Register extends Fragment {
                 Static.user_place = (Static.user_place).replaceAll(" ", "_");
                 Static.user_place = (Static.user_place).replaceAll(",", "");
 
+                //start a async task to send details to server
                 Task t = new Task(msg);
                 t.execute();
 
@@ -106,20 +108,6 @@ public class Register extends Fragment {
                 = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    public boolean isValidEmail(String email) {
-
-        String EMAIL_REGEX = "^(.+)@(.+)$";
-        return email.matches(EMAIL_REGEX);
-    }
-
-    // validating password with retype password
-    private boolean isValidPassword(String pass) {
-        if (pass != null && pass.length() > 6) {
-            return true;
-        }
-        return false;
     }
 
 
@@ -139,9 +127,7 @@ public class Register extends Fragment {
 
         @Override
         protected void onPostExecute(String result){
-            Log.e("REC1",result);
             if(getParameter(result,"type").equals("user_id")){
-                Log.e("REC",result);
                 Static.user_id = Integer.parseInt(getParameter(result,"id"));
                 Register.spinner.setVisibility(View.GONE);
                 Intent inten = new Intent(MainActivity.cx, Main2Activity.class);

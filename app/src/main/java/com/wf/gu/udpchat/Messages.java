@@ -115,7 +115,6 @@ public class Messages extends AppCompatActivity {
             @Override
             public void onMessage(String message) {
                 if (!message.isEmpty() && getParameter(message, "type").equals("message")) {
-                    Log.e("RECM",message+" my id "+USER_ID);
                     if(getParameter(message, "fid").equals(USER_ID+"")) {
                         runOnUiThread(() -> {
                             messages.add(getParameter(message, "value"));
@@ -206,20 +205,6 @@ public class Messages extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Unable to Connect to Server, May be the server is down", Toast.LENGTH_LONG).show();
                     j[0] = 0;
                 }
-            }
-        });
-
-        im.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, DetailActivity2.class);
-                intent.putExtra("USER_ID", USER_ID);
-                intent.putExtra("USER_NAME", USER_NAME);
-                intent.putExtra("PLACE", USER_PLACE);
-                intent.putExtra("STATUS", USER_STATUS);
-                intent.putExtra("IMAGE", USER_IMAGE);
-                context.startActivity(intent);
             }
         });
 
@@ -405,7 +390,6 @@ public class Messages extends AppCompatActivity {
                 do {
                     v = true;
                     messages.add(0, cursor.getString(cursor.getColumnIndex("MESSAGE")));
-                    Log.e("IS_WHOM", cursor.getInt(cursor.getColumnIndex("IS_WHOM")) + "");
                     if (cursor.getInt(cursor.getColumnIndex("IS_WHOM")) == 0) {
                         b.add(0, false);
                         is_ck = true;

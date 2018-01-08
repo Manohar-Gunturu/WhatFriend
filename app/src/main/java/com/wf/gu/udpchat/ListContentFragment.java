@@ -25,7 +25,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,17 +56,6 @@ public class ListContentFragment extends Fragment {
 
     }
 
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-
-
-        }
-    };
-
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -77,8 +65,6 @@ public class ListContentFragment extends Fragment {
         adapter = new ContentAdapter(recyclerView.getContext());
         dbHelper = new DBHelper(getActivity().getApplication());
         recyclerView.setAdapter(adapter);
-
-
 
 
         SocketWrapper.attachListener(new Callback() {
@@ -117,7 +103,6 @@ public class ListContentFragment extends Fragment {
 
     @Override
     public void onPause() {
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
         super.onPause();
     }
 
@@ -137,7 +122,6 @@ public class ListContentFragment extends Fragment {
                     intent.putExtra("USER_ID", ids.get(getAdapterPosition()));
                     intent.putExtra("USER_PLACE", places.get(getAdapterPosition()));
                     intent.putExtra("USER_STATUS", status.get(getAdapterPosition()));
-                    intent.putExtra("IS_CONTACT", false);
                     v.getContext().startActivity(intent);
                 }
             });
@@ -179,7 +163,6 @@ public class ListContentFragment extends Fragment {
 
 
     class Task implements Runnable{
-
         @Override
         public void run() {
             SocketWrapper.send("type=get_users;id="+Static.user_id+";");

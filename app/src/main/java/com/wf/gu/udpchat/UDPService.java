@@ -40,8 +40,6 @@ public class UDPService extends Service {
         db = dbHelper.getReadableDatabase();
         IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
-        mReceiver = new MyReceiver();
-        registerReceiver(mReceiver, intentFilter);
         new Thread(()->{
             SocketWrapper.start(db);
         }).start();

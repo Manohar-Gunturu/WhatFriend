@@ -74,6 +74,7 @@ public class Main2Activity extends AppCompatActivity {
         });
 
         boolean condition = sharedPref.getBoolean("whatfriend_if_reg", false);
+
         if (condition) {
             Static.user_name = sharedPref.getString("whatfriend_user_name", "").replaceAll(" ", "_");
             Static.user_place = sharedPref.getString("whatfriend_user_place", "").replaceAll(" ", "");
@@ -120,7 +121,6 @@ public class Main2Activity extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.d("curent_view", "" + position);
                 if (position == 0) {
                     Static.curent_view = "CHAT";
                 } else if (position == 1) {
@@ -146,11 +146,9 @@ public class Main2Activity extends AppCompatActivity {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
-                Log.i("isMyServiceRunning?", true + "");
                 return true;
             }
         }
-        Log.i("isMyServiceRunning?", false + "");
         return false;
     }
 
@@ -179,14 +177,12 @@ public class Main2Activity extends AppCompatActivity {
     @Override
     protected void onResume() {
         Static.is_visible = true;
-        //Static.curent_view = "CHAT";
         super.onResume();
     }
 
     @Override
     protected void onPause() {
         Static.is_visible = false;
-        // Static.curent_view = "SIR";
         super.onPause();
     }
 
