@@ -23,23 +23,14 @@ import umt.SocketWrapper;
 public class UDPService extends Service {
 
     DBHelper dbHelper = null;
-    BroadcastReceiver mReceiver;
     SQLiteDatabase db = null;
 
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
 
     @Override
     public void onCreate() {
         dbHelper = new DBHelper(this.getApplication());
         db = dbHelper.getReadableDatabase();
-        IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        intentFilter.addAction(Intent.ACTION_SCREEN_OFF);
+
         new Thread(()->{
             SocketWrapper.start(db);
         }).start();
